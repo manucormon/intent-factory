@@ -1,5 +1,5 @@
 """
-9 tests for the cycling intent classifier instance.
+10 tests for the cycling intent classifier instance.
 
 Verified findings (DECLARED thresholds, seed=42, ftp=300W, 600s ride):
   - ATTACK fires correctly when power > 1.05 FTP on moderate gradient
@@ -8,8 +8,15 @@ Verified findings (DECLARED thresholds, seed=42, ftp=300W, 600s ride):
   - MAINTAIN covers the middle band
   - Synthetic ride produces all 3 labels across its 5 phases
   - project_ahead labels match classify() output sample-by-sample
+
+Real data validation (GoldenCheetah OpenData, anonymous athlete, CC BY 4.0):
+  - Source: 363-min real ride, FTP estimated at 208W (95% of best 20-min avg)
+  - Sample: t=300–900s (601 samples), ATTACK 55.9% / MAINTAIN 35.6% / RECOVER 8.5%
+  - All 3 labels appear; ATTACK ratio is plausible for an active climbing segment
+  - data/real_ride_sample.csv is REAL power + DECLARED gradient/fatigue
 """
 
+import csv
 import sys
 import pytest
 from pathlib import Path
@@ -93,6 +100,29 @@ def test_synthetic_ride_produces_all_three_labels(clf, ride):
     assert "ATTACK" in labels
     assert "MAINTAIN" in labels
     assert "RECOVER" in labels
+
+
+def test_real_ride_produces_all_three_labels(clf):
+    """
+    Verified finding: 601 samples from a real GoldenCheetah ride (t=300-900s,
+    FTP=208W, CC BY 4.0 anonymous athlete) produce all three intent labels.
+    ATTACK=55.9%, MAINTAIN=35.6%, RECOVER=8.5% — sensible for a climbing segment.
+    Data provenance: power=REAL, gradient/fatigue=DECLARED (derived from GPS).
+    """
+    data_path = Path(__file__).parents[1] / "data" / "real_ride_sample.csv"
+    counts = {"ATTACK": 0, "MAINTAIN": 0, "RECOVER": 0}
+    with open(data_path) as f:
+        for row in csv.DictReader(f):
+            state = clf.classify(
+                power_w=float(row["power_w"]),
+                ftp_w=float(row["ftp_w"]),
+                gradient_pct=float(row["gradient_pct"]),
+                fatigue=float(row["fatigue"]),
+            )
+            counts[state.label] += 1
+    assert counts["ATTACK"] > 0,   "No ATTACK labels in real ride segment"
+    assert counts["MAINTAIN"] > 0, "No MAINTAIN labels in real ride segment"
+    assert counts["RECOVER"] > 0,  "No RECOVER labels in real ride segment"
 
 
 def test_project_ahead_matches_classify(clf, ride):
