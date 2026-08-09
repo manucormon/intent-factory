@@ -1,16 +1,36 @@
 # NOTES — cycling instance
 
 **Status:** verified
-**Data:** DECLARED (synthetic ride generator)
+**Data:** REAL power (GoldenCheetah OpenData, CC BY 4.0) + DECLARED gradient/fatigue
 
 ## Data provenance
 
 | Variable | Label | Source |
 |---|---|---|
-| power_w, gradient_pct | OBSERVED | `data_loader.generate_ride()`, physics-plausible ranges |
-| fatigue | OBSERVED (DECLARED) | linear model: t / 3600s, same as sensory_architecture_factory ENMAX |
+| power_w | REAL | GoldenCheetah OpenData — anonymous athlete, 363-min ride |
+| gradient_pct | DECLARED | derived from GPS alt/km, clipped ±15% for noise |
+| fatigue | DECLARED | linear model: t / ride_duration |
 | intent label | CLASSIFIED | `core/classifier.py` — threshold rules |
-| future intent sequence | PROJECTED | `classifier.project_ahead()` |
+| future intent sequence | PROJECTED | `classifier.project_ahead()` — see honest limit below |
+
+**FTP estimation:** 95% of best 20-minute sliding-window average power = 208W
+(industry standard for field-test FTP estimation).
+
+## Honest limit: what project_ahead() does and does NOT do
+
+`project_ahead(samples, steps)` classifies a caller-supplied sequence of
+sensor samples — it does **not** forecast what the sensor values will be.
+There is no autoregressive model, no time-series prediction, no Kalman filter.
+
+Concretely: if you call `project_ahead(next_30_samples, 30)`, you are
+supplying the hypothetical future state yourself. The function returns what
+the intent *would be* if those samples occurred.
+
+**Why it's built this way:** labeling "what intent the athlete had at t+1"
+requires ground truth that doesn't exist in public cycling datasets. An
+alternative name (`classify_sequence`, `label_batch`) would be more
+technically precise — but would break the family's conceptual narrative
+without adding safety. The limit is documented here; `project_ahead` stays.
 
 ## Verified findings
 
@@ -23,8 +43,9 @@
    observed power. Rationale: above this threshold the power reading is unreliable
    as an intent signal — the athlete may be in distress, not deliberate recovery.
 
-3. **Synthetic 600s ride covers all zones:** seed=42 produces warm-up, tempo,
-   attack, and recovery phases. All three labels appear in the classification sequence.
+3. **Real GoldenCheetah ride (t=300-900s, FTP=208W):** all three intent labels
+   present — ATTACK 55.9% / MAINTAIN 35.6% / RECOVER 8.5%. Plausible distribution
+   for an active climbing segment. Power=REAL; gradient/fatigue=DECLARED.
 
 ## Key design decision
 Classifier is **stateless** — each sample is classified independently.
