@@ -1,10 +1,18 @@
 # intent_factory
 
-**Kairos family — Brother 2: Predict-intent**
+**Kairos family — Brother 2: Classify observable effort state**
 
-Classifies what a human or agent *intends to do next*, given observed sensor state.
+Applies declared rules to observable cycling signals and emits an
+ATTACK/MAINTAIN/RECOVER effort-state label. These labels have not been validated
+against human-intent ground truth and must not be presented as mind-reading or
+reliable future-intent prediction.
 Sits between `perception_factory` (what is happening physically) and `planning_factory`
 (what to do about it).
+
+**Status:** implementation tested (10/10); construct validity and automation-bias
+effects are `NOT_EVALUATED`. Permitted use is experimental/observe-only. Do not
+use the labels for time-critical human decisions until the documented study gate
+in `CONTRACT.md` is satisfied.
 
 ## What it does
 
@@ -27,7 +35,7 @@ a confidence vocabulary:
 
 ```
 perception_factory  →  intent_factory  →  planning_factory  →  sensory_architecture_factory
- (what is moving)      (what is intended)   (what to do)          (is the human ready)
+ (what is moving)      (effort-state label)   (what to do)          (is the human ready)
 ```
 
 ## Quick start

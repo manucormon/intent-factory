@@ -3,14 +3,15 @@
 Part of the Kairos family. See `kairos-factory/CONTRACT_FAMILY.md` for shared invariants.
 
 ## Brother identity
-- **Position:** Brother 2 — Predict-intent
-- **Time axis:** near-future intent (what will the agent do in the next N seconds?)
+- **Position:** Brother 2 — classify observable effort state (predict-intent is aspirational)
+- **Time axis:** present classification; PROJECTED labels require caller-supplied future samples
 - **Facing:** World-facing (reads sensor state, not human cognitive state)
 
 ## Family invariants satisfied
 
 | Invariant | How |
 |---|---|
+| Automation bias / construct validity | `NOT_EVALUATED` — experimental/observe-only only |
 | Confidence vocabulary | OBSERVED / CLASSIFIED / PROJECTED — in every output |
 | Latency exposed | `projected.dt_ahead` on every ProjectedIntent |
 | Verified finding | All thresholds verified in tests, documented in NOTES.md |

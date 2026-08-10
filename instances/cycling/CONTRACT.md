@@ -3,7 +3,7 @@
 ## Instance identity
 - **Domain:** competitive cycling — intent classification from power meter data
 - **Data source:** REAL power (GoldenCheetah OpenData, CC BY 4.0, anonymous athlete) + DECLARED gradient/fatigue
-- **Status:** verified
+- **Status:** implementation verified; construct validity `NOT_EVALUATED`
 
 ## Capability declarations
 
@@ -46,6 +46,14 @@ what the intent *would be* if those samples occurred — not what *will*
 occur.
 
 This limit is by design and documented honestly, not as a temporary gap.
+
+## Construct-validity gate
+
+The tests verify deterministic threshold behavior and data provenance. They do
+not establish that ATTACK/MAINTAIN/RECOVER corresponds to the rider's actual
+intent; no labeled intent ground truth is available. Human-facing or
+time-critical use remains blocked until the automation-bias comparison required
+by the root `CONTRACT.md` is completed and reviewed.
 
 ## Key verified findings
 

@@ -1,6 +1,6 @@
 # NOTES — cycling instance
 
-**Status:** verified
+**Status:** implementation verified; construct validity `NOT_EVALUATED`
 **Data:** REAL power (GoldenCheetah OpenData, CC BY 4.0) + DECLARED gradient/fatigue
 
 ## Data provenance
