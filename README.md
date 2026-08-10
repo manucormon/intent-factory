@@ -51,7 +51,7 @@ print(future.dt_ahead)    # 30.0 seconds
 pytest instances/cycling/tests/
 ```
 
-9 tests, all passing. Verified findings documented in `instances/cycling/NOTES.md`.
+10 tests, all passing. Verified findings documented in `instances/cycling/NOTES.md`.
 
 ## Guardrail 8 — latency budget
 Every prediction exposes `dt_ahead`: how many seconds into the future the
